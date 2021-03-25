@@ -1,0 +1,20 @@
+[package]
+authors = ["myname <myemail@example.com>"]
+name = "whisper"
+version = "0.1.0"
+
+[dependencies]
+rand = "0.8.3"
+vst = "0.2.1"
+# if you aren't following this tutorial to a T, and a newer version
+# has been released, you might wish to get the crate directly
+# off of our official Github repository like this:
+# vst = { git = "https://github.com/rust-dsp/rust-vst" }
+
+# iced = {git = "https://github.com/hatoo/iced.git", branch = "winit-0.2.1"}
+# iced_wgpu = {git = "https://github.com/hatoo/iced.git", branch = "winit-0.2.1"}
+# iced_winit = {git = "https://github.com/hatoo/iced.git", branch = "winit-0.2.1"}
+
+[lib]
+crate-type = ["cdylib"]
+name = "whisper"
