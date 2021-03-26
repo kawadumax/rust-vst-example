@@ -15,6 +15,10 @@ vst = "0.2.1"
 # iced_wgpu = {git = "https://github.com/hatoo/iced.git", branch = "winit-0.2.1"}
 # iced_winit = {git = "https://github.com/hatoo/iced.git", branch = "winit-0.2.1"}
 
+iced = {version = "0.2.0", features = ["iced_wgpu"]}
+iced_wgpu = "0.3.0"
+iced_winit = "0.2.0"
+
 [lib]
 crate-type = ["cdylib"]
 name = "whisper"

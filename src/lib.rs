@@ -193,132 +193,142 @@ impl Plugin for Whisper {
     }
 }
 
-const WIDTH: u32 = 400;
-const HEIGHT: u32 = 200;
+// const WIDTH: u32 = 400;
+// const HEIGHT: u32 = 200;
 
-struct GUIWrapper {
-    params: Arc<WhisperParameters>,
-    inner: Option<GUI>,
-}
+// struct GUIWrapper {
+//     params: Arc<WhisperParameters>,
+//     inner: Option<GUI>,
+// }
 
-struct GUI {
-    // イベントを消化するGenerator、ウインドウが閉じると終わる
-    gen: Box<dyn std::marker::Unpin + std::ops::Generator<Yield = (), Return = ()>>,
-}
+// struct GUI {
+//     // イベントを消化するGenerator、ウインドウが閉じると終わる
+//     gen: Box<dyn std::marker::Unpin + std::ops::Generator<Yield = (), Return = ()>>,
+// }
 
-impl GUI {
-    fn new(parent: HWND, params: Arc<WhisperParameters>) -> Self {
-        let mut setting = iced_winit::Settings::default();
-        // Settings for VST
-        setting.window.decorations = false;
-        setting.window.platform_specific.parent = Some(parent);
-        setting.window.size = (WIDTH, HEIGHT);
+// impl GUI {
+//     fn new(parent: HWND, params: Arc<WhisperParameters>) -> Self {
+//         let mut setting = iced_winit::Settings::default();
+//         // Settings for VST
+//         setting.window.decorations = false;
+//         setting.window.platform_specific.parent = Some(parent);
+//         setting.window.size = (WIDTH, HEIGHT);
 
-        // Initialize `Application` to share `params`
-        let app = WhisperGUI::new(params);
-        // Save Box of `Generator` to do event loop on idle method
-        // これがフォークして生やしたメソッド
-        let gen = app.run_generator(Command::none(), setting);
+//         // Initialize `Application` to share `params`
+//         let app = WhisperGUI::new(params);
+//         // Save Box of `Generator` to do event loop on idle method
+//         // これがフォークして生やしたメソッド
+//         let gen = app.run_generator(Command::none(), setting);
 
-        Self { gen }
-    }
-}
+//         Self { gen }
+//     }
+// }
 
-impl Editor for GUIWrapper {
-    fn size(&self) -> (i32, i32) {
-        // 今のところ、ここでウインドウサイズを取得する方法はないので固定値を返す。
-        // 動いているのでOK
-        (WIDTH as i32, HEIGHT as i32)
-    }
+// impl Editor for GUIWrapper {
+//     fn size(&self) -> (i32, i32) {
+//         // 今のところ、ここでウインドウサイズを取得する方法はないので固定値を返す。
+//         // 動いているのでOK
+//         (WIDTH as i32, HEIGHT as i32)
+//     }
 
-    fn position(&self) -> (i32, i32) {
-        (0, 0)
-    }
+//     fn position(&self) -> (i32, i32) {
+//         (0, 0)
+//     }
 
-    // Generatorを進めてイベントを処理する
-    fn idle(&mut self) {
-        // Poll events here
-        if let Some(inner) = self.inner.as_mut() {
-            if let std::ops::GeneratorState::Complete(_) =
-                Generator::resume(std::pin::Pin::new(&mut inner.gen))
-            {
-                self.inner = None;
-            }
-        }
-    }
+//     // Generatorを進めてイベントを処理する
+//     fn idle(&mut self) {
+//         // Poll events here
+//         if let Some(inner) = self.inner.as_mut() {
+//             if let std::ops::GeneratorState::Complete(_) =
+//                 Generator::resume(std::pin::Pin::new(&mut inner.gen))
+//             {
+//                 self.inner = None;
+//             }
+//         }
+//     }
 
-    fn close(&mut self) {
-        self.inner = None;
-    }
+//     fn close(&mut self) {
+//         self.inner = None;
+//     }
 
-    fn open(&mut self, parent: *mut c_void) -> bool {
-        self.inner = Some(GUI::new(parent as HWND, self.params.clone()));
-        true
-    }
+//     fn open(&mut self, parent: *mut c_void) -> bool {
+//         self.inner = Some(GUI::new(parent as HWND, self.params.clone()));
+//         true
+//     }
 
-    fn is_open(&mut self) -> bool {
-        self.inner.is_some()
-    }
-}
+//     fn is_open(&mut self) -> bool {
+//         self.inner.is_some()
+//     }
 
-use iced::{Column, Element, Text};
+//     fn set_knob_mode(&mut self, mode: vst::editor::KnobMode) -> bool {
+//         false
+//     }
 
-// icedの`Application`
-struct WhisperGUI {
-    params: Arc<WhisperParameters>,
-    // スライダー用のデータ
-    volume_slider: iced::widget::slider::State,
-}
+//     fn key_up(&mut self, keycode: vst::editor::KeyCode) -> bool {
+//         false
+//     }
 
-impl WhisperGUI {
-    fn new(params: Arc<WhisperParameters>) -> Self {
-        Self {
-            params,
-            volume_slider: Default::default(),
-        }
-    }
-}
+//     fn key_down(&mut self, keycode: vst::editor::KeyCode) -> bool {
+//         false
+//     }
+// }
 
-#[derive(Debug, Clone, Copy)]
-enum Message {
-    VolumeChanged(f32),
-}
+// // icedの`Application`
+// struct WhisperGUI {
+//     params: Arc<WhisperParameters>,
+//     // スライダー用のデータ
+//     volume_slider: iced::widget::slider::State,
+// }
 
-// 直接iced_winitを使う
-impl iced_winit::Application for WhisperGUI {
-    type Renderer = iced_wgpu::Renderer;
-    type Message = Message;
+// impl WhisperGUI {
+//     fn new(params: Arc<WhisperParameters>) -> Self {
+//         Self {
+//             params,
+//             volume_slider: Default::default(),
+//         }
+//     }
+// }
 
-    fn new() -> (Self, Command<Self::Message>) {
-        // 使わないのでコンパイルだけ通るようにする
-        unimplemented!()
-    }
+// #[derive(Debug, Clone, Copy)]
+// enum Message {
+//     VolumeChanged(f32),
+// }
 
-    fn title(&self) -> String {
-        String::from("Whisper")
-    }
+// // 直接iced_winitを使う
+// impl iced_winit::Application for WhisperGUI {
+//     type Renderer = iced_wgpu::Renderer;
+//     type Message = Message;
 
-    fn update(&mut self, message: Message) -> Command<Self::Message> {
-        match message {
-            Message::VolumeChanged(v) => {
-                self.params.volume.set(v);
-            }
-        }
-        Command::none()
-    }
+//     fn new() -> (Self, Command<Self::Message>) {
+//         // 使わないのでコンパイルだけ通るようにする
+//         unimplemented!()
+//     }
 
-    fn view(&mut self) -> Element<Message> {
-        Column::new()
-            .padding(20)
-            .push(Text::new("Volume".to_string()).size(32))
-            .push(iced::widget::Slider::new(
-                &mut self.volume_slider,
-                0.0..=1.0,
-                self.params.volume.get(),
-                Message::VolumeChanged,
-            ))
-            .into()
-    }
-}
+//     fn title(&self) -> String {
+//         String::from("Whisper")
+//     }
+
+//     fn update(&mut self, message: Message) -> Command<Self::Message> {
+//         match message {
+//             Message::VolumeChanged(v) => {
+//                 self.params.volume.set(v);
+//             }
+//         }
+//         Command::none()
+//     }
+
+//     fn view(&mut self) -> Element<Message> {
+//         Column::new()
+//             .padding(20)
+//             .push(Text::new("Volume".to_string()).size(32))
+//             .push(iced::widget::Slider::new(
+//                 &mut self.volume_slider,
+//                 0.0..=1.0,
+//                 self.params.volume.get(),
+//                 Message::VolumeChanged,
+//             ))
+//             .into()
+//     }
+// }
 
 plugin_main!(Whisper);
